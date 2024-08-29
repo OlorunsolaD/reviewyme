@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: Admin-Service
+
+
+server:
+  port: 8032

@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: Resume-Service
+
+
+server:
+  port: 8033

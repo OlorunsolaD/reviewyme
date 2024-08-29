@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: User-Service
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/Reviewyme
+
+server:
+  port: 8031
