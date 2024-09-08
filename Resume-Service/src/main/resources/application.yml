@@ -1,6 +1,11 @@
 spring:
   application:
-    name: Resume-Service
+    name: Resume-service
+
+
+    data:
+      mongodb:
+        uri:mongodb://localhost:27017/Reviewyme
 
 
 server:

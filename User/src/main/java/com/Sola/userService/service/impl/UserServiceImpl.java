@@ -21,10 +21,12 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserServiceInterface {
 
     private final UserRepo userRepo;
+   // private final PasswordEncoder passwordEncoder;
 
    @Autowired
    public UserServiceImpl(UserRepo userRepo){
        this.userRepo = userRepo;
+       //this.PasswordEncoder = passwordEncoder;
     }
 
 
@@ -36,6 +38,8 @@ public class UserServiceImpl implements UserServiceInterface {
                .address(userRegistrationRequest.getAddress())
                .password(userRegistrationRequest.getPassword())
                .build();
+       // String hashedPassword = passwordEncoder.encode(userRegistrationRequest.getPassword());
+        //        user.setPassword(hashedPassword);
 
         return userRepo.save(userEntity);
 

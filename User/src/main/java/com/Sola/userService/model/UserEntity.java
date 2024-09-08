@@ -27,7 +27,7 @@ public class UserEntity {
     private String address;
     private String phoneNumber;
     private String role; //client and admin
-    private String resumeId; // Reference to resumes in Resume-Service
+    private String resumeId; // Reference to resumes in Resume-service
     private UserStatus Status;
 
 }

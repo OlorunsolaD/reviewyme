@@ -1,6 +1,7 @@
 spring:
   application:
-    name: User-Service
+    name: User-service
+
 
   data:
     mongodb:
@@ -8,3 +9,9 @@ spring:
 
 server:
   port: 8031
+
+
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ANT_PATH_MATCHER
+
