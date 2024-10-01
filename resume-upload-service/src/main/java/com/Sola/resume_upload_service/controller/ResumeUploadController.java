@@ -25,7 +25,6 @@ public class ResumeUploadController {
 
     @Autowired
     private final ResumeUploadService resumeUploadService; // Inject the interface, not the implementation
-
     public ResumeUploadController(ResumeUploadService resumeUploadService){
         this.resumeUploadService = resumeUploadService;
     }

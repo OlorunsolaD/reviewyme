@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: Reviewyme
+    volumes:
+      - mongo-data:/data/db
+
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8031:8031"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/Reviewyme
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

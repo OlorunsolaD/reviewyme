@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -43,12 +44,9 @@ public class Resume {
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL)
     private List<Reference> referenceList;
 
-    @ManyToOne
-    @JoinColumn(name = "template_id")
-    private Template template;
+    private ResumeStatus resumeStatus;// Status of the resume process (PENDING_REVIEW, UNDER_REVIEW, COMPLETED, etc.)
 
-    private String status; // Status of the resume process (PENDING_REVIEW, UNDER_REVIEW, COMPLETED, etc.)
-
+    private Set<Roles> roles; // Admin and Resume roles
     private java.util.Date createdAt;
 
     private java.util.Date updatedAt;

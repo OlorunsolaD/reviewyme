@@ -1,7 +1,6 @@
 package com.Sola.resume_creation_service.service;
-
 import com.Sola.resume_creation_service.dto.*;
-import com.Sola.resume_creation_service.exception.TemplateNotFoundException;
+import com.Sola.resume_creation_service.exception.ResumeNotFoundException;
 import com.Sola.resume_creation_service.model.*;
 import com.Sola.resume_creation_service.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,25 +17,19 @@ public class ResumeCreationServiceImpl implements ResumeCreationService {
 
 
     private final ResumeCreationRepository resumeCreationRepository;
-    private final TemplateRepository templateRepository;
+
 
     @Autowired
-    public ResumeCreationServiceImpl(ResumeCreationRepository resumeCreationRepository,
-                                     TemplateRepository templateRepository) {
+    public ResumeCreationServiceImpl(ResumeCreationRepository resumeCreationRepository) {
 
         this.resumeCreationRepository = resumeCreationRepository;
-        this.templateRepository = templateRepository;
+
     }
 
     @Override
     public Resume createResume(ResumeCreationRequest resumeCreationRequest) {
-        Template template = templateRepository.findById(resumeCreationRequest.getTemplateId())
-                .orElseThrow(() -> new TemplateNotFoundException(" Template Not Found with the id: "
-                        + resumeCreationRequest.getTemplateId()));
-
         // Build the Resume object using the Builder pattern
         Resume.ResumeBuilder resumeBuilder = Resume.builder()
-                .template(template)
                 .status("PENDING_REVIEW");
 
         // Map Contact information using the Builder
@@ -89,6 +82,64 @@ public class ResumeCreationServiceImpl implements ResumeCreationService {
         Resume resume = resumeBuilder.build();
         return resumeCreationRepository.save(resume);
 
+    }
+
+
+    @Override
+    public Resume updateResume(Long id, ResumeCreationRequest resumeCreationRequest) {
+        Resume resume = resumeCreationRepository.findById(id)
+                .orElseThrow(() -> new ResumeNotFoundException("Resume not found with ID:" + id));
+
+        if (resumeCreationRequest.getContact() != null) {
+            Contact contact = mapContact(resumeCreationRequest.getContact());
+            resume.setContact(contact);
+        }
+
+        if (resumeCreationRequest.getEducationList() != null) {
+            List<Education> educationList = resumeCreationRequest.getEducationList().stream()
+                    .map(this::mapEducation)
+                    .collect(Collectors.toList());
+            resume.setEducationList(educationList);
+        }
+
+        if (resumeCreationRequest.getExperienceList() != null) {
+            List<Experience> experienceList = resumeCreationRequest.getExperienceList()
+                    .stream()
+                    .map(this::mapExperience)
+                    .collect(Collectors.toList());
+            resume.setExperienceList(experienceList);
+        }
+
+        if (resumeCreationRequest.getCertificationList() != null){
+            List<Certification> certificationList = resumeCreationRequest.getCertificationList()
+                    .stream()
+                    .map(this::mapCertification)
+                    .collect(Collectors.toList());
+            resume.setCertificationList(certificationList);
+        }
+
+        if (resumeCreationRequest.getSkillsList() != null){
+            List<Skills> skillsList = resumeCreationRequest.getSkillsList()
+                    .stream()
+                    .map(this::mapSkills)
+                    .collect(Collectors.toList());
+            resume.setSkillsList(skillsList);
+        }
+
+        if (resumeCreationRequest.getReferenceList() != null){
+            List<Reference> referenceList = resumeCreationRequest.getReferenceList()
+                    .stream()
+                    .map(this::mapReference)
+                    .collect(Collectors.toList());
+            resume.setReferenceList(referenceList);
+        }
+
+        if (resumeCreationRequest.getSummary() != null) {
+            Summary summary = mapSummary(resumeCreationRequest.getSummary());
+            resume.setSummary(summary);
+        }
+
+        return resumeCreationRepository.save(resume);
     }
 
 
@@ -165,19 +216,11 @@ public class ResumeCreationServiceImpl implements ResumeCreationService {
                 .graduationMonthYear(educationDto.getGraduationMonthYear())
                 .build();
     }
-    {
-    }
-
-
-    @Override
-    public Resume updateResume(Resume resume) {
-        return resumeCreationRepository.save(resume);
-    }
 
     @Override
     public Resume getResumeById(Long id) {
         return resumeCreationRepository.findById(id)
-                .orElseThrow(() ->new RuntimeException(" Resume not found with id:" + id));
+                .orElseThrow(() ->new ResumeNotFoundException(" Resume not found with id:" + id));
     }
 
     @Override
@@ -188,7 +231,10 @@ public class ResumeCreationServiceImpl implements ResumeCreationService {
     @Override
     public void deleteResumeById(Long id) {
         Resume resume = resumeCreationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(" Resume not found with id:" + id));
+                .orElseThrow(() -> new ResumeNotFoundException(" Resume not found with id:" + id));
+        resumeCreationRepository.delete(resume);
 
     }
+
+
 }

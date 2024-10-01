@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Set;
 
 
 @Data
@@ -18,16 +19,13 @@ public class UserEntity {
     @Id
     private String id;
 
-
     private String username;
     private String password;
     private String fullName;
     private String email;
-    private String address;
     private String phoneNumber;
-    private String role; //client and admin
-    private String templateId;
-    private String resumeId; // Reference to resumes in Resume-service
+
+    private Set<UserRole> roles; //To store multiple roles such as user and admin
     private UserStatus Status;
 
 }

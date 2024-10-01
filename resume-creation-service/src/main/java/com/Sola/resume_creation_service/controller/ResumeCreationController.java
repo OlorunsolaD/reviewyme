@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/resumesTemplates")
+@RequestMapping("/api/resumes")
 public class ResumeCreationController {
 
     private final ResumeCreationService resumeCreationService;
@@ -30,51 +30,36 @@ public class ResumeCreationController {
     }
 
     @PutMapping("/{id}/complete-review")
-    public ResponseEntity<Resume> completeResumeReview (@Valid @PathVariable Long id){
+    public ResponseEntity<Resume> completeResumeReview (@PathVariable Long id){
         Resume resume = resumeCreationService.getResumeById(id);
-
-        if (resume == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, " Resume not found with id: " + id);
-        }
 
         // update status as completed
         resume.setStatus("COMPLETED");
-        Resume updatedResume = resumeCreationService.updateResume(resume);
 
+        // Save the updated resume
+        Resume updatedResume = resumeCreationService.updateResume(id, ResumeCreationRequest.builder().build());
         return ResponseEntity.status(HttpStatus.OK).body(updatedResume);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Resume>> getAllResumes (){
-
         List<Resume> resumes = resumeCreationService.getAllResumes();
-
         return ResponseEntity.status(HttpStatus.OK).body(resumes);
 
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<Resume> getResumeById (@Valid @PathVariable Long id){
+    public ResponseEntity<Resume> getResumeById (@PathVariable Long id){
 
         Resume resume = resumeCreationService.getResumeById(id);
-
-        if (resume == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found with id:" + id);
-        }
-
         return ResponseEntity.status(HttpStatus.OK).body(resume);
 
     }
 
     @DeleteMapping("/delete{id}/")
-    public ResponseEntity<Void> deleteResumeById (@Valid @PathVariable Long id){
-        try {
+    public ResponseEntity<Void> deleteResumeById (@PathVariable Long id){
             resumeCreationService.deleteResumeById(id);
-            // Return HTTP 204 (No Content) upon successful deletion
             return ResponseEntity.noContent().build();
-        } catch (ConfigDataResourceNotFoundException e){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
     }
 }
 
