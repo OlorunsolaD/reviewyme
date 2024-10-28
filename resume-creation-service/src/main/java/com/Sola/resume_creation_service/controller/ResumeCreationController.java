@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/resumes")
+@RequestMapping("/api/v1/resumes")
 public class ResumeCreationController {
 
     private final ResumeCreationService resumeCreationService;
@@ -34,7 +34,7 @@ public class ResumeCreationController {
         Resume resume = resumeCreationService.getResumeById(id);
 
         // update status as completed
-        resume.setStatus("COMPLETED");
+//        resume.setStatus("COMPLETED");
 
         // Save the updated resume
         Resume updatedResume = resumeCreationService.updateResume(id, ResumeCreationRequest.builder().build());

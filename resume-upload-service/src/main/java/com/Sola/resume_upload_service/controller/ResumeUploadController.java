@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/resume")
+@RequestMapping("/api/v2/resumes")
 @Tag(name = "Resume Controller", description = "Controller that manages and upload resumes")
 public class ResumeUploadController {
 

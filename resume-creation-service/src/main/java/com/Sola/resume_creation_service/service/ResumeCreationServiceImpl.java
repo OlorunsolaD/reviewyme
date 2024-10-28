@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.Sola.resume_creation_service.model.ResumeStatus.PENDING_REVIEW;
+
 
 @Service
 @Transactional
@@ -30,7 +32,7 @@ public class ResumeCreationServiceImpl implements ResumeCreationService {
     public Resume createResume(ResumeCreationRequest resumeCreationRequest) {
         // Build the Resume object using the Builder pattern
         Resume.ResumeBuilder resumeBuilder = Resume.builder()
-                .status("PENDING_REVIEW");
+                .resumeStatus(PENDING_REVIEW); // Spring Security isAdmin configuration required! //
 
         // Map Contact information using the Builder
         if (resumeCreationRequest.getContact() != null) {
