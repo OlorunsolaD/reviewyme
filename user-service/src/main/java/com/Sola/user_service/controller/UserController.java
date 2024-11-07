@@ -4,7 +4,7 @@ import com.Sola.user_service.dto.UserRegistrationRequest;
 import com.Sola.user_service.dto.UserResponseDto;
 import com.Sola.user_service.model.UserEntity;
 import com.Sola.user_service.model.UserStatus;
-import com.Sola.user_service.service.interfac.UserService;
+import com.Sola.user_service.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -41,12 +42,22 @@ public class UserController {
 
     public ResponseEntity<UserResponseDto> registerUser(
             @Parameter(description = "User Registration Request", required = true)
-           @Valid @RequestBody UserRegistrationRequest userRegistrationRequest){
-        UserEntity createdUser = userService.createUser(userRegistrationRequest);
-        UserResponseDto userResponseDto = new UserResponseDto(createdUser.getId(),
-                createdUser.getFullName(), createdUser.getEmail());
+            @Valid @RequestPart("userRegistrationRequest") UserRegistrationRequest userRegistrationRequest,
+            @RequestPart(value = "resumeFile", required = false)MultipartFile file) {
+
+        // Create user and optionally create a resume and upload a file
+        UserEntity createdUser = userService.createUserandResume(userRegistrationRequest, file);
+
+        // Map the created user to a UserResponseDto and return it as the response
+        UserResponseDto userResponseDto = new UserResponseDto(
+                createdUser.getId(),
+                createdUser.getFullName(),
+                createdUser.getEmail()
+        );
+
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
+
     // Public - No Authentication Required!
     @GetMapping("/find/{id}")
     @Operation(summary = "Get User By id",

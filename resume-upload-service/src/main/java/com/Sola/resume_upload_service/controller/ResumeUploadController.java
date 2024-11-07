@@ -3,7 +3,6 @@ package com.Sola.resume_upload_service.controller;
 import com.Sola.resume_upload_service.dto.ResumeUploadRequest;
 import com.Sola.resume_upload_service.model.ResumeUploadEntity;
 import com.Sola.resume_upload_service.service.ResumeUploadService;
-import com.Sola.resume_upload_service.service.ResumeUploadServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -62,7 +61,7 @@ public class ResumeUploadController {
 
     }
 
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     @Operation(summary = "Update Resume", description = "Updates an existing resume by uploading new file.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Resume updated successfully", content = @Content),
@@ -87,7 +86,7 @@ public class ResumeUploadController {
                     .body(e.getMessage());
         }
     }
-    @GetMapping("/findResume/{id}")
+    @GetMapping("/findFile/{id}")
     public ResponseEntity<ResumeUploadEntity> getResumeById (@PathVariable String id){
         Optional<ResumeUploadEntity> resume = resumeUploadService.getResumeById(id);
         return resume.map(ResponseEntity::ok)
@@ -96,7 +95,7 @@ public class ResumeUploadController {
 
     }
 
-    @DeleteMapping("/deleteResume/{id}")
+    @DeleteMapping("/deleteFile/{id}")
     public ResponseEntity<ResumeUploadEntity> deleteResumeById(@PathVariable String id) {
         Optional<ResumeUploadEntity> resumeFile = resumeUploadService.deleteResumeById(id);
         return resumeFile.map(resumeUploadEntity -> ResponseEntity.ok(resumeUploadEntity))

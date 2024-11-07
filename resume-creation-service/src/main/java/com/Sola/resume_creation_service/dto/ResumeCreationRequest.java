@@ -1,6 +1,5 @@
 package com.Sola.resume_creation_service.dto;
 
-import com.Sola.resume_creation_service.model.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -39,4 +38,6 @@ public class ResumeCreationRequest {
 
     @Valid
     private List<ReferenceDto> referenceList;
+
+    private String userId;
 }

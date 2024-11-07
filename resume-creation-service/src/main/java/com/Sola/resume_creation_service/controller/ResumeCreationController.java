@@ -29,8 +29,8 @@ public class ResumeCreationController {
 
     }
 
-    @PutMapping("/{id}/complete-review")
-    public ResponseEntity<Resume> completeResumeReview (@PathVariable Long id){
+    @PutMapping("/{id}/update")
+    public ResponseEntity<Resume> updateResume (@PathVariable Long id){
         Resume resume = resumeCreationService.getResumeById(id);
 
         // update status as completed
@@ -56,7 +56,7 @@ public class ResumeCreationController {
 
     }
 
-    @DeleteMapping("/delete{id}/")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteResumeById (@PathVariable Long id){
             resumeCreationService.deleteResumeById(id);
             return ResponseEntity.noContent().build();

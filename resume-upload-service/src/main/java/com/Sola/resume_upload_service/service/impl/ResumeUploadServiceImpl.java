@@ -1,8 +1,9 @@
-package com.Sola.resume_upload_service.service;
+package com.Sola.resume_upload_service.service.impl;
 
 import com.Sola.resume_upload_service.dto.ResumeUploadRequest;
 import com.Sola.resume_upload_service.model.ResumeUploadEntity;
 import com.Sola.resume_upload_service.repository.ResumeUploadRepository;
+import com.Sola.resume_upload_service.service.ResumeUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

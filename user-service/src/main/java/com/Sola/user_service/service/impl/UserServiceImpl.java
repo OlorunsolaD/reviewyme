@@ -1,18 +1,29 @@
 package com.Sola.user_service.service.impl;
+import com.Sola.resume_creation_service.dto.ContactDto;
+import com.Sola.resume_creation_service.dto.ResumeCreationRequest;
+import com.Sola.resume_creation_service.dto.SummaryDto;
+import com.Sola.resume_creation_service.model.Resume;
+import com.Sola.resume_upload_service.dto.ResumeUploadRequest;
+import com.Sola.resume_upload_service.model.ResumeUploadEntity;
 import com.Sola.user_service.dto.UserRegistrationRequest;
 import com.Sola.user_service.exception.UserNotFoundException;
 import com.Sola.user_service.model.UserEntity;
 import com.Sola.user_service.model.UserRole;
 import com.Sola.user_service.model.UserStatus;
 import com.Sola.user_service.repository.UserRepository;
-import com.Sola.user_service.service.interfac.UserService;
+import com.Sola.user_service.service.ResumeCreationClient;
+import com.Sola.user_service.service.ResumeUploadClient;
+import com.Sola.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -24,40 +35,69 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ResumeCreationClient resumeCreationClient;
+    private final ResumeUploadClient resumeUploadClient;
 
    @Autowired
    public UserServiceImpl(UserRepository userRepository,
-                          PasswordEncoder passwordEncoder){
+                          PasswordEncoder passwordEncoder,
+                          ResumeCreationClient resumeCreationClient,
+                          ResumeUploadClient resumeUploadClient){
        this.userRepository = userRepository;
        this.passwordEncoder = passwordEncoder;
+       this.resumeCreationClient = resumeCreationClient;
+       this.resumeUploadClient = resumeUploadClient;
     }
 
 
-    public UserEntity createUser(UserRegistrationRequest userRegistrationRequest) {
+    public UserEntity createUserandResume(UserRegistrationRequest userRegistrationRequest, MultipartFile file) {
 
-       // Encode Password
-       String hashedPassword = passwordEncoder.encode(userRegistrationRequest.getPassword());
+        // Encode Password
+        String hashedPassword = passwordEncoder.encode(userRegistrationRequest.getPassword());
 
-       Set<UserRole> roles = new HashSet<>();
-       roles.add(UserRole.ROLE_CLIENT);
+        Set<UserRole> roles = new HashSet<>();
+        roles.add(UserRole.ROLE_CLIENT);
 
-       if (userRegistrationRequest.isAdmin()){
-           roles.add(UserRole.ROLE_ADMIN); // Add Admin Role if requested
+        if (userRegistrationRequest.isAdmin()) {
+            roles.add(UserRole.ROLE_ADMIN); // Add Admin Role if requested
 
-       }
+        }
 
-       UserEntity userEntity = UserEntity.builder()
-               .fullName(userRegistrationRequest.getFullName())
-               .email(userRegistrationRequest.getEmail())
-               .phoneNumber(userRegistrationRequest.getPhoneNumber())
-               .password(hashedPassword)
-               .Status(UserStatus.ACTIVE)
-               .roles(roles)
-               .build();
+        UserEntity userEntity = UserEntity.builder()
+                .fullName(userRegistrationRequest.getFullName())
+                .email(userRegistrationRequest.getEmail())
+                .phoneNumber(userRegistrationRequest.getPhoneNumber())
+                .password(hashedPassword)
+                .Status(UserStatus.ACTIVE)
+                .roles(roles)
+                .build();
 
-        return userRepository.save(userEntity);
+        UserEntity savedUser = userRepository.save(userEntity);
 
+//        return userRepository.save(userEntity);
+
+        ResumeCreationRequest resumeRequest = ResumeCreationRequest.builder()
+                .templateId(2L)
+                .contact(new ContactDto())
+                .educationList(new ArrayList<>())
+                .experienceList(new ArrayList<>())
+                .certificationList(new ArrayList<>())
+                .skillsList(new ArrayList<>())
+                .summary(new SummaryDto())
+                .referenceList(new ArrayList<>())
+                .userId(savedUser.getId()) // Optionally Link Resume to User
+                .build();
+
+        Resume createdResume = resumeCreationClient.createResume(resumeRequest);
+
+//        Resume file upload logic below
+        if (file != null && !file.isEmpty()){
+             resumeUploadClient.uploadResume(file);
+        }
+
+        return savedUser;
     }
+
 
 
     public UserEntity updateUser(String id, UserRegistrationRequest userRegistrationRequest) {
@@ -73,7 +113,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setFullName(userRegistrationRequest.getFullName());
         userEntity.setEmail(userRegistrationRequest.getEmail());
         userEntity.setPhoneNumber(userRegistrationRequest.getPhoneNumber());
-        userEntity.setPassword(userRegistrationRequest.getPassword());
+        userEntity.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
 
         // Save the updated entity back to the database
         return userRepository.save(userEntity);
@@ -132,9 +172,8 @@ public class UserServiceImpl implements UserService {
    public UserEntity findByEmailAndPassword(String email, String rawPassword) {
        UserEntity userEntity = userRepository.findByEmail(email)
                .orElseThrow(() -> new UserNotFoundException("User with the email: " + email + "was not found"));
-       if (passwordEncoder.matches(rawPassword, userEntity.getPassword())) {
+       if (!passwordEncoder.matches(rawPassword, userEntity.getPassword())) {
 
-       } else {
            throw new IllegalArgumentException("Invalid email or password");
        }
        return userEntity;

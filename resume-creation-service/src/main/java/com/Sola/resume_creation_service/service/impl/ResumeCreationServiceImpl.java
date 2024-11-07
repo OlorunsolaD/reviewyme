@@ -1,8 +1,9 @@
-package com.Sola.resume_creation_service.service;
+package com.Sola.resume_creation_service.service.impl;
 import com.Sola.resume_creation_service.dto.*;
 import com.Sola.resume_creation_service.exception.ResumeNotFoundException;
 import com.Sola.resume_creation_service.model.*;
 import com.Sola.resume_creation_service.repository.*;
+import com.Sola.resume_creation_service.service.ResumeCreationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
