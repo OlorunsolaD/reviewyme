@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,12 +34,23 @@ public class ResumeCreationController {
     public ResponseEntity<Resume> updateResume (@PathVariable Long id){
         Resume resume = resumeCreationService.getResumeById(id);
 
-        // update status as completed
-//        resume.setStatus("COMPLETED");
-
         // Save the updated resume
         Resume updatedResume = resumeCreationService.updateResume(id, ResumeCreationRequest.builder().build());
         return ResponseEntity.status(HttpStatus.OK).body(updatedResume);
+    }
+
+    @PutMapping("/{id}/under_review") // Admin Only Access point
+    @PreAuthorize("hasRole ('ADMIN')")
+    public ResponseEntity<String> markResumeUnderReview (@PathVariable Long id){
+        resumeCreationService.markResumeCreatedUnderReview(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Resume marked as UNDER_REVIEW.");
+    }
+
+    @PutMapping("/{id}/completed") // Admin Only Access point
+    @PreAuthorize("hasRole ('ADMIN')")
+    public ResponseEntity<String> markResumeCompleted (@PathVariable Long id){
+        resumeCreationService.markResumeCreatedCompleted(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Resume marked as COMPLETED");
     }
 
     @GetMapping("/all")

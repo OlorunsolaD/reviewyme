@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -239,5 +240,28 @@ public class ResumeCreationServiceImpl implements ResumeCreationService {
 
     }
 
+    @Override
+    public void markResumeCreatedUnderReview(Long id) {
+        Resume resume = resumeCreationRepository.findById(id)
+                .orElseThrow(() -> new ResumeNotFoundException("Resume not found with ID: " + id));
+        if (resume.getResumeStatus() != PENDING_REVIEW) {
+            throw new IllegalStateException("Only resumes in PENDING_REVIEW status can be marked as UNDER_REVIEW.");
 
+        }
+        resume.setResumeStatus(ResumeStatus.UNDER_REVIEW);
+        resume.setUpdatedAt(new Date());
+        resumeCreationRepository.save(resume);
+    }
+
+    @Override
+    public void markResumeCreatedCompleted(Long id) {
+        Resume resume = resumeCreationRepository.findById(id)
+                .orElseThrow(() -> new ResumeNotFoundException("Resume not found with ID: " + id));
+        if (resume.getResumeStatus() != ResumeStatus.UNDER_REVIEW){
+
+        }
+        resume.setResumeStatus(ResumeStatus.COMPLETED);
+        resume.setUpdatedAt(new Date());
+        resumeCreationRepository.save(resume);
+    }
 }

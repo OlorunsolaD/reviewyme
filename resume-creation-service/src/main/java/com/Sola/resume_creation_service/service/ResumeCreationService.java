@@ -15,4 +15,7 @@ public interface ResumeCreationService {
     List<Resume> getAllResumes ();
     void deleteResumeById (Long id);
 
+    void markResumeCreatedUnderReview (Long id);
+    void markResumeCreatedCompleted (Long id);
+
 }

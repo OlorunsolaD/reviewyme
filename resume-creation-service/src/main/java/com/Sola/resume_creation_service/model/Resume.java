@@ -46,7 +46,7 @@ public class Resume {
 
     private ResumeStatus resumeStatus;// Status of the resume process (PENDING_REVIEW, UNDER_REVIEW, COMPLETED, etc.)
 
-    private Set<Roles> roles; // Admin and Resume roles
+//    private Set<Roles> roles; // Admin and Resume roles
     private java.util.Date createdAt;
 
     private java.util.Date updatedAt;
