@@ -10,3 +10,20 @@ spring:
 
 server:
   port: 8033
+
+
+  profiles:
+    active: dev
+
+---
+spring:
+  profiles: dev
+file:
+  upload-dir: /path/to/dev/upload/directory
+
+---
+spring:
+  profiles: prod
+file:
+  upload-dir: /path/to/prod/upload/directory
+

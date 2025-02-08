@@ -16,5 +16,6 @@ public class ResumeUploadRequest {
 
     @NotNull(message = "File must not be Null")
     @Size(min = 1, message = "File must not be Empty")
-    private MultipartFile file;
+    private MultipartFile filePart;
+    private String userId;
 }

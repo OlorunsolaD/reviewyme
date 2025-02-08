@@ -39,5 +39,5 @@ public class ResumeCreationRequest {
     @Valid
     private List<ReferenceDto> referenceList;
 
-    private String userId;
+//    private String userId;
 }

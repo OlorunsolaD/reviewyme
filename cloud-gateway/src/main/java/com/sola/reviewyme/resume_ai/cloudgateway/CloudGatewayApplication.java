@@ -1,4 +1,4 @@
-package com.sola.cloudgateway;
+package com.sola.reviewyme.resume_ai.cloudgateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -5,10 +5,12 @@ import com.Sola.resume_upload_service.model.ResumeUploadEntity;
 import com.Sola.resume_upload_service.repository.ResumeUploadRepository;
 import com.Sola.resume_upload_service.service.ResumeUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,6 +18,8 @@ public class ResumeUploadServiceImpl implements ResumeUploadService {
 
     private final ResumeUploadRepository resumeUploadRepository;
 
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Autowired
     public ResumeUploadServiceImpl(ResumeUploadRepository resumeUploadRepository) {
@@ -23,62 +27,82 @@ public class ResumeUploadServiceImpl implements ResumeUploadService {
     }
 
     @Override
-    public ResumeUploadEntity saveResume(ResumeUploadRequest resumeUploadRequest) throws IOException {
-        MultipartFile file = resumeUploadRequest.getFile(); // Now getting MultipartFile
-        if (file.isEmpty()) {
-            throw new IllegalStateException("Cannot save empty file.");
-        }
+    public ResumeUploadEntity uploadResume(ResumeUploadRequest resumeUploadRequest) {
+        MultipartFile file = resumeUploadRequest.getFilePart(); // Now getting MultipartFile
 
-        String contentType = file.getContentType();
-        if (!isAllowedMimeType(contentType)) {
-            throw new IllegalStateException("Only PDF or DOCX files are allowed.");
-        }
+        validateFile(file);
 
-        ResumeUploadEntity resume = new ResumeUploadEntity();
-        resume.setFileName(file.getOriginalFilename());
-        resume.setData(file.getBytes()); // IOException could be thrown here
-        return resumeUploadRepository.save(resume);
-    }
-
-    private boolean isAllowedMimeType(String contentType){
-        return contentType != null && (contentType.equals("application/pdf") ||
-                contentType.equals("application/msword") ||
-                contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
-    }
-
-    @Override
-    public Optional<ResumeUploadEntity> getResumeById(String id) {
-        return resumeUploadRepository.findById(id);
-    }
-
-    @Override
-    public ResumeUploadEntity updateResume(String id, ResumeUploadRequest resumeUploadRequest) throws IOException {
-        return resumeUploadRepository.findById(id).map(existingResume -> {
-            MultipartFile file = resumeUploadRequest.getFile();
-            if (file.isEmpty()) {
-                throw new IllegalStateException("Cannot update with empty file.");
-            }
-            updateResumeData(existingResume, file);  // Refactored logic into a helper method
-            return resumeUploadRepository.save(existingResume);
-        }).orElseThrow(() -> new RuntimeException("Resume not found with id " + id));
-    }
-
-    // Helper method to update the existing resume entity with new file data
-    private void updateResumeData(ResumeUploadEntity resume, MultipartFile file) {
-        resume.setFileName(file.getOriginalFilename());
         try {
-            resume.setData(file.getBytes());  // File data (byte[]) is set here
+
+            ResumeUploadEntity resume = ResumeUploadEntity.builder()
+                    .fileName(file.getOriginalFilename())
+                    .filePart(file.getContentType())
+                    .fileSize(file.getSize())
+                    .data(file.getBytes())
+                    .userId(resumeUploadRequest.getUserId())
+                    .build();
+
+            return resumeUploadRepository.save(resume);
+
         } catch (IOException e) {
-            throw new RuntimeException("Failed to update file data", e);  // Wrap with a cause
+            throw new RuntimeException("Failed to store file " + file.getOriginalFilename(),e);
+
+
         }
 
     }
 
     @Override
-    public Optional<ResumeUploadEntity> deleteResumeById(String id) {
-       ResumeUploadEntity resumeUploadEntity = resumeUploadRepository.findById(id)
-               .orElseThrow(() ->new RuntimeException("Resume Not Found with id" + id));
-       resumeUploadRepository.deleteById(id);
-       return Optional.of(resumeUploadEntity);
+    public ResumeUploadEntity getResumeById(String id) {
+        return resumeUploadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Resume not found with ID: " + id));
+    }
+
+    public List<ResumeUploadEntity> GetAllResumesByUserId (String userId) {
+        return resumeUploadRepository.findByUserId(userId);
+
+}
+
+    @Override
+    public ResumeUploadEntity updateResume(String id, ResumeUploadRequest resumeUploadRequest){
+        MultipartFile file = resumeUploadRequest.getFilePart();
+        validateFile(file);
+
+        try {
+            ResumeUploadEntity existingUploadResume = resumeUploadRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Resume not found with ID: " + id));
+
+            existingUploadResume.setFileName(file.getOriginalFilename());
+            existingUploadResume.setFilePart(file.getContentType());
+            existingUploadResume.setFileSize(file.getSize());
+            existingUploadResume.setUserId(resumeUploadRequest.getUserId());
+            existingUploadResume.setData(file.getBytes());
+
+            return resumeUploadRepository.save(existingUploadResume);
+        } catch (IOException e){
+            throw new RuntimeException("Failed to update file " + file.getOriginalFilename(), e);
+        }
+
+    }
+
+    @Override
+    public void deleteResumeById(String id) {
+        ResumeUploadEntity resumeUploadEntity = getResumeById(id);
+        resumeUploadRepository.deleteById(id);
+    }
+
+    private void validateFile(MultipartFile file) {
+
+        if (file.isEmpty()) {
+            throw new RuntimeException("Empty file");
+        }
+        if (!List.of("application/pdf", "application/msword",
+                        "application/application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                .contains(file.getContentType())) {
+            throw new RuntimeException("Invalid file type! Only PDF and DOCX files are allowed.");
+        }
+        if (file.getSize() > 5 * 1024 * 1024) { // 5MB Limit
+            throw new RuntimeException("File Size exceeds 5MB Limit.");
+        }
     }
 }

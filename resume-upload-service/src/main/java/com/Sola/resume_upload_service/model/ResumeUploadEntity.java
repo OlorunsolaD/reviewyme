@@ -18,6 +18,9 @@ public class ResumeUploadEntity {
     @Id
     private String id;
     private String fileName;
-    private byte[] data;
+    private String filePart;
+    private Long fileSize;
+    private byte[] data; // Consider storing in GridFS or external storage for large files
+    private String userId;
 
 }

@@ -38,15 +38,15 @@ public class UserServiceImpl implements UserService {
     private final ResumeCreationClient resumeCreationClient;
     private final ResumeUploadClient resumeUploadClient;
 
-   @Autowired
-   public UserServiceImpl(UserRepository userRepository,
-                          PasswordEncoder passwordEncoder,
-                          ResumeCreationClient resumeCreationClient,
-                          ResumeUploadClient resumeUploadClient){
-       this.userRepository = userRepository;
-       this.passwordEncoder = passwordEncoder;
-       this.resumeCreationClient = resumeCreationClient;
-       this.resumeUploadClient = resumeUploadClient;
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           ResumeCreationClient resumeCreationClient,
+                           ResumeUploadClient resumeUploadClient) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.resumeCreationClient = resumeCreationClient;
+        this.resumeUploadClient = resumeUploadClient;
     }
 
 
@@ -85,17 +85,18 @@ public class UserServiceImpl implements UserService {
                 .skillsList(new ArrayList<>())
                 .summary(new SummaryDto())
                 .referenceList(new ArrayList<>())
-                .userId(savedUser.getId()) // Optionally Link Resume to User
+//                .userId(savedUser.getId()) // Optionally Link Resume to User
                 .build();
 
         Resume createdResume = resumeCreationClient.createResume(resumeRequest);
 
-//        Resume file upload logic below
-        if (file != null && !file.isEmpty()){
-             resumeUploadClient.uploadResume(file);
-        }
-
-        return savedUser;
+////        Resume file upload logic below
+//        if (file != null && !file.isEmpty()){
+//             resumeUploadClient.uploadResume(file);
+//        }
+//
+//        return savedUser;
+        return userEntity;
     }
 
 

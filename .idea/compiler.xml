@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="resume-ai-service" />
         <module name="payment-service" />
         <module name="resume-creation-service" />
         <module name="review-service" />
@@ -24,6 +25,7 @@
       <module name="cloud-gateway" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
+      <module name="resume-ai-service" options="-parameters" />
       <module name="resume-creation-service" options="-parameters" />
       <module name="resume-upload-service" options="-parameters" />
       <module name="review-service" options="-parameters" />

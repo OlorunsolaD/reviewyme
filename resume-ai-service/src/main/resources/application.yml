@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: resume-ai-service
+
+
+server:
+  port: 8035
+
+
