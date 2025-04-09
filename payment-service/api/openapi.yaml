@@ -1,0 +1,123 @@
+openapi: 3.0.1
+info:
+  title: Payment API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/v1
+
+paths:
+  /api/payments/initiate:
+    post:
+      summary: Initiates a payment
+      tags:
+        - payment-controller
+      operationId: initiatePayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiatePaymentRequest'
+      responses:
+        200:
+          description: Payment initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitiatePaymentResponse'
+
+  /api/payments/verify/{transactionId}:
+    get:
+      summary: Verifies a payment
+      tags:
+        - payment-controller
+      operationId: verifyPayment
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "80bbc31b-2989-4b18-b873-c7348f37a6da"
+      responses:
+        200:
+          description: Payment verification details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPaymentResponse'
+
+  /api/payments:
+    get:
+      summary: fetches user payments
+      tags:
+        - payment-controller
+      operationId: getUserPayments
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "bc66c48a67fc-1722290520376"
+      responses:
+        200:
+          description: User payments details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUserPaymentsResponse'
+
+components:
+  schemas:
+    InitiatePaymentRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: 75bc66c48a67fc-1722290520376
+        productName:
+          type: string
+          example: PRODUCT CV REVIEW
+        amount:
+          type: number
+          example: 56.75
+        quantity:
+          type: integer
+          example: 1
+        currency:
+          type: string
+          example: GBP
+      required:
+        - userId
+        - productName
+        - amount
+        - quantity
+        - currency
+    InitiatePaymentResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          example: "80bbc31b-2989-4b18-b873-c7348f37a6da"
+        paymentLink:
+          type: string
+          example: "https://localhost.com:8090"
+    VerifyPaymentResponse:
+      type: object
+      properties:
+        paymentStatus:
+          type: string
+          example: "SUCCESS"
+        referenceId:
+          type: string
+          example: "REF123456789"
+    GetUserPaymentsResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          example: "d85ed2bd-e59d-425b-8ac5-1330a7290ec9-1743986763"
