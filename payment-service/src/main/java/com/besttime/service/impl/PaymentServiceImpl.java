@@ -63,11 +63,10 @@ public class PaymentServiceImpl implements PaymentService {
             String transactionId = PaymentServiceUtil.generateUniqueTransactionId();
             initiatePaymentResponse.setTransactionId(transactionId);
 
-            String referenceId;
             StripeCheckoutDto stripeCheckoutDto = buildStripeCheckoutDto(initiatePaymentRequest, transactionId);
 
             Session session = stripeCheckoutSession.createCheckoutSession(stripeCheckoutDto);
-            referenceId = session.getId();
+            String referenceId = session.getId();
             initiatePaymentResponse.setPaymentLink(session.getUrl());
 
             Payment payment = buildPaymentDocument(initiatePaymentRequest, transactionId, referenceId);
