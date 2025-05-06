@@ -18,6 +18,6 @@ class PaymentApplicationTest {
 
     @Test
     void contextLoads() {
-        assertThrows(UnsatisfiedDependencyException.class, () -> PaymentApplication.main(new String[]{}));
+        assertDoesNotThrow(() -> PaymentApplication.main(new String[]{}));
     }
 }
